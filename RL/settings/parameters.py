@@ -12,7 +12,7 @@ class RLParameters:
     def __init__(self):
         self.reward_length = -1
         self.reward_mof = -10
-        self.episodes = 1e4
+        self.episodes = 10000
         self.cables = 2
         self.learning_rate = 0.5
         self.epsilon = 0.1
