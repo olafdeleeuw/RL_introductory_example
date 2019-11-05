@@ -30,29 +30,45 @@ agent.initialize_state_values()
 
 
 # execute grid planning
-def execute_grid_planning():
+def train_grid_planning():
     while not env.grid_finished():
         agent.take_action()
+        # print("agents action: " + str(agent.action))
         agent.update_matrix_env()
-        agent.update_agents_action_history()
+        # print(env.env_matrix)
+        agent.update_agents_state_history()
         agent.update_free_cable_pieces()
 
-        # print(agent.free_cable_pieces)
-        # print(agent.action_history)
-        # print(env.unconnected_houses)
-
-        print("number of moffen: " + str(env.env_matrix[:, 5].sum()))
-        print("cable length: " + str(env.env_matrix[np.where(env.env_matrix[:, 7] == 1)[0], 4].sum()))
+        # print("free cables: " + str(agent.free_cable_pieces))
+        # print("state history: " + str(agent.state_history))
+        # print("cables used: " + str(env.cables_used))
+        # print("unconnected houses: " + str(env.unconnected_houses))
+        # print("min state value: " + str(min(agent.state_value)))
+        # print("finished......: " + str(env.grid_finished()))
 
     env.get_reward()
     agent.update_state_value()
-    print(env.reward)
 
 
-for t in range(params.episodes):
-    if t % 200 == 0:
-        print(t)
-    execute_grid_planning()
+# reset environment settings and objects
+def reset_env_elements():
+    agent.reset_state_history()
+    agent.initialize_free_cable_pieces()
+    env.initialize_env_matrix()
+    env.set_unconnected_houses()
+    env.reset_cables_used()
 
 
+def execute_grid_planning():
+    # set epsilon to zero
+    params.epsilon = 0
+    while not env.grid_finished():
+        agent.take_action()
+        # print("agents action: " + str(agent.action))
+        agent.update_matrix_env()
+        agent.update_free_cable_pieces()
 
+    print("cable length: " + str(env.env_matrix[np.where(env.env_matrix[:, 6] == 1)[0], 4].sum()))
+    print("number of moffen used: " + str(env.determine_number_of_moffen(env.env_matrix, env.grid.df_nodes)))
+    print("number of cables used: " + str(env.cables_used))
+    print("env matrix: " + str(env.env_matrix))
