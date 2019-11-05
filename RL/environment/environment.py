@@ -20,6 +20,7 @@ class RLEnvironment:
         self.env_matrix = None
         self.edges = None
         self.cable_pieces = None
+        self.cables_used = []
         self.max_cable_length = 0
         self.number_states = 0
         self.unconnected_houses = 0
@@ -73,6 +74,9 @@ class RLEnvironment:
         # number of cable pieces depend on number of cables specified in settings
         self.cable_pieces = np.arange(0, self.settings.cables * self.edges.shape[0])
 
+    def reset_cables_used(self):
+        self.cables_used = []
+
     # set number of possible state
     def set_number_of_states(self):
         # each state may be 0 (empty) or 1 (chosen)
@@ -109,11 +113,11 @@ class RLEnvironment:
     # check if the grid is complete, if all houses are connected and in the graph is connected
     def grid_finished(self):
         path_existence = []
-        for l in range(self.settings.cables):
-            path = self.verify_path_existence_level(self.env_matrix, self.grid.df_nodes, l)
+        for c in self.cables_used:
+            path = self.verify_path_existence_level(self.env_matrix, self.grid.df_nodes, c)
             path_existence.append(path)
 
-        if sum(path_existence) == self.settings.cables and self.unconnected_houses == 0:
+        if sum(path_existence) == len(self.cables_used) and self.unconnected_houses == 0:
             grid_finished = 1
         else:
             grid_finished = 0
@@ -125,9 +129,11 @@ class RLEnvironment:
         # r = n_moffen * cost_moffen + used_cable_length / max_cable_length * cost_cable_length
         n_moffen = self.determine_number_of_moffen(self.env_matrix, self.grid.df_nodes)
         trace_length = self.env_matrix[np.where(self.env_matrix[:, 6] == 1)[0], 4].sum()
+        cables_used = len(self.cables_used)
         cost_moffen = n_moffen * self.settings.reward_mof
         cost_length = trace_length / self.max_cable_length * self.settings.reward_length
-        self.reward = cost_moffen + cost_length
+        cost_all_cables_used = cables_used * self.settings.reward_all_cables_used
+        self.reward = cost_moffen + cost_length + cost_all_cables_used
 
     # two helper functions are needed, one to determine whether the agent needs a mof when he chooses a cable piece and
     # another to check if the agent has a connected graph. If not he cannot be finished.
@@ -188,4 +194,7 @@ class RLEnvironment:
         g.add_edges_from(env_edges_lvl)
 
         # check if graph is connected
-        return nx.is_connected(g)
+        if len(g.nodes) > 1:
+            return nx.is_connected(g)
+        else:
+            return False

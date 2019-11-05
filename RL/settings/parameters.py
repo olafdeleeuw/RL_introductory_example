@@ -29,8 +29,11 @@ class RLParameters:
     def update_reward_mof(self, new_reward_mof):
         self.reward_mof = new_reward_mof
 
-    def update_reward_houses(self, new_reward_houses):
-        self.reward_connected_houses = new_reward_houses
+    def update_reward_cables_uses(self, new_reward_cables_used):
+        self.reward_all_cables_used = new_reward_cables_used
+
+    # def update_reward_houses(self, new_reward_houses):
+    #     self.reward_connected_houses = new_reward_houses
 
     def update_learning_rate(self, new_learning_rate):
         self.learning_rate = new_learning_rate
