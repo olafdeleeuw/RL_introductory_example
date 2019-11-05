@@ -10,9 +10,10 @@ class RLParameters:
     """
 
     def __init__(self):
-        self.reward_length = -1
-        self.reward_mof = -10
-        self.episodes = 10000
+        self.reward_length = -5
+        self.reward_mof = -2
+        self.reward_all_cables_used = 2
+        self.episodes = 50000
         self.cables = 2
         self.learning_rate = 0.5
         self.epsilon = 0.1
