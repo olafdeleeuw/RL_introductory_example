@@ -2,6 +2,7 @@
 
 # input libraries
 import pandas as pd
+import numpy as np
 import networkx as nx
 import logging
 
@@ -25,6 +26,8 @@ class InputData:
         self.node_list_msr = []
         self.node_list_households = []
         self.nodes_pos = {}
+        self.cable1_pos = {}
+        self.cable2_pos = {}
         self.household_nodes_pos = {}
         self.edge_tuples = []
         self.network_graph = nx.Graph()
@@ -87,6 +90,24 @@ class InputData:
                                     7: (55, 45),
                                     8: (60, 45)}
 
+    def create_cable1_pos(self):
+        self.cable1_pos = {8: (1, 0),
+                           9: (1, 21),
+                           10: (-119, 21),
+                           11: (-119, 51),
+                           12: (1, 51),
+                           13: (101, 51),
+                           14: (101, 21)}
+
+    def create_cable2_pos(self):
+        self.cable2_pos = {14: (2, 0),
+                           15: (2, 22),
+                           16: (-118, 22),
+                           17: (-118, 52),
+                           18: (2, 52),
+                           19: (102, 52),
+                           20: (102, 22)}
+
     def prepare_grid_data(self):
         # run the functions that create node and edges lists
         self.create_node_list_without_msr()
@@ -118,3 +139,25 @@ class InputData:
         # add nodes and edges to the networkx graph
         graph.add_edges_from(edge_list, size=size, color=color)
         return graph
+
+    @staticmethod
+    def create_nodes_and_edges_result(result):
+        x1 = result[np.where(result[0:8, 6] == 1)[0], 0] + 8
+        nodes_x1 = x1.reshape(x1.shape[0], ).tolist()[0]
+        y1 = result[np.where(result[0:8, 6] == 1)[0], 1] + 8
+        nodes_y1 = y1.reshape(y1.shape[0], ).tolist()[0]
+        x2 = result[np.where(result[8:16, 6] == 1)[0], 0] + 14
+        nodes_x2 = x2.reshape(x2.shape[0], ).tolist()[0]
+        y2 = result[np.where(result[8:16, 6] == 1)[0], 1] + 14
+        nodes_y2 = y2.reshape(y2.shape[0], ).tolist()[0]
+
+        edge_tuples1 = []
+        for i in range(len(nodes_x1)):
+            edge1 = (nodes_x1[i], nodes_y1[i])
+            edge_tuples1.append(edge1)
+        edge_tuples2 = []
+        for i in range(len(nodes_x2)):
+            edge2 = (nodes_x2[i], nodes_y2[i])
+            edge_tuples2.append(edge2)
+
+        return edge_tuples1, edge_tuples2
