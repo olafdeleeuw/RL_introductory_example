@@ -127,18 +127,23 @@ class RLEnvironment:
     # reward only given when agent is finished and depends on cable length and number of moffen
     def get_reward(self):
         # r = n_moffen * cost_moffen + used_cable_length / max_cable_length * cost_cable_length
-        n_moffen = self.determine_number_of_moffen(self.env_matrix, self.grid.df_nodes)
+        n_moffen = 0
+        for l in self.cables_used:
+            n_moffen += self.determine_number_of_moffen(self.env_matrix, self.grid.df_nodes, l)
         trace_length = self.env_matrix[np.where(self.env_matrix[:, 6] == 1)[0], 4].sum()
         cables_used = len(self.cables_used)
-        cost_moffen = n_moffen * self.settings.reward_mof
+
+        # use normalized costs
+        cost_moffen = n_moffen / 4 * self.settings.reward_mof  # 4 is maximum number of moffen
         cost_length = trace_length / self.max_cable_length * self.settings.reward_length
-        cost_all_cables_used = cables_used * self.settings.reward_all_cables_used
+        cost_all_cables_used = cables_used / self.settings.cables * self.settings.reward_all_cables_used
+
         self.reward = cost_moffen + cost_length + cost_all_cables_used
 
     # two helper functions are needed, one to determine whether the agent needs a mof when he chooses a cable piece and
     # another to check if the agent has a connected graph. If not he cannot be finished.
     @staticmethod
-    def determine_number_of_moffen(env_matrix, df_nodes):
+    def determine_number_of_moffen(env_matrix, df_nodes, level):
         g = nx.Graph()
         # add MSR node
         node_msr = df_nodes.loc[df_nodes['MSR'] > 0, 'NODE_ID'].values

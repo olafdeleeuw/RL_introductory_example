@@ -12,13 +12,17 @@ for t in range(rl_exec.params.episodes):
     rl_exec.train_grid_planning()
 
     # reset
-    if t % 500 == 0:
+    if t % 1000 == 0:
         print("episode: " + str(t))
         print("agents reward: " + str(rl_exec.env.reward))
         print("cable length: " + str(rl_exec.env.env_matrix[np.where(rl_exec.env.env_matrix[:, 6] == 1)[0], 4].sum()))
-        print("number of moffen used: " + str(rl_exec.env.determine_number_of_moffen(rl_exec.env.env_matrix,
-                                                                                     rl_exec.env.grid.df_nodes)))
-        print("number of cables used: " + str(rl_exec.env.cables_used))
+        n_moffen = 0
+        for l in rl_exec.env.cables_used:
+            n_moffen += rl_exec.env.determine_number_of_moffen(rl_exec.env.env_matrix, rl_exec.env.grid.df_nodes, l)
+        print("number of moffen used: " + str(n_moffen))
+        print("cables used: " + str(rl_exec.env.cables_used))
+        print("matrix: " + str(rl_exec.env.env_matrix))
+        print("max state value: " + str(max(rl_exec.agent.state_value)))
 
     # reset object for new run
     rl_exec.reset_env_elements()

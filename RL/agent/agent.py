@@ -21,13 +21,15 @@ class RLAgent:
         self.free_cable_pieces = []
         self.state_value = []
         self.state_history = []
+        self.action_history = []
         self.action = None
         self.state = None
 
     # initialize state values
     # first run: all states same value 0. No cable piece is better than another
     def initialize_state_values(self):
-        self.state_value = np.zeros(self.env.number_states)
+        # self.state_value = np.zeros(self.env.number_states)
+        self.state_value = np.repeat([0.], self.env.number_states)
 
     # set all free cable pieces
     def initialize_free_cable_pieces(self):
@@ -40,6 +42,10 @@ class RLAgent:
     # reset state history
     def reset_state_history(self):
         self.state_history = []
+
+    # reset action history
+    def reset_action_history(self):
+        self.action_history = []
 
     # take action
     # follow epsilon-greedy policy
@@ -86,6 +92,7 @@ class RLAgent:
     # update the action history
     def update_agents_state_history(self):
         self.state_history.append(self.state)
+        self.action_history.append(self.action)
 
     # update state value
     # based on sort of backpropagation executed and end of an episode

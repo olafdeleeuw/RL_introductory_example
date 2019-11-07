@@ -41,9 +41,11 @@ def train_grid_planning():
 
         # print("free cables: " + str(agent.free_cable_pieces))
         # print("state history: " + str(agent.state_history))
+        # print("action history: " + str(agent.action_history))
         # print("cables used: " + str(env.cables_used))
         # print("unconnected houses: " + str(env.unconnected_houses))
         # print("min state value: " + str(min(agent.state_value)))
+        # print("max state value: " + str(max(agent.state_value)))
         # print("finished......: " + str(env.grid_finished()))
 
     env.get_reward()
@@ -53,6 +55,7 @@ def train_grid_planning():
 # reset environment settings and objects
 def reset_env_elements():
     agent.reset_state_history()
+    agent.reset_action_history()
     agent.initialize_free_cable_pieces()
     env.initialize_env_matrix()
     env.set_unconnected_houses()
@@ -69,6 +72,9 @@ def execute_grid_planning():
         agent.update_free_cable_pieces()
 
     print("cable length: " + str(env.env_matrix[np.where(env.env_matrix[:, 6] == 1)[0], 4].sum()))
-    print("number of moffen used: " + str(env.determine_number_of_moffen(env.env_matrix, env.grid.df_nodes)))
+    n_moffen = 0
+    for l in env.cables_used:
+        n_moffen += env.determine_number_of_moffen(env.env_matrix, env.grid.df_nodes, l)
+    print("number of moffen used: " + str(n_moffen))
     print("number of cables used: " + str(env.cables_used))
     print("env matrix: " + str(env.env_matrix))
