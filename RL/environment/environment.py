@@ -150,19 +150,19 @@ class RLEnvironment:
         g.add_nodes_from(node_msr)
 
         # add nodes and edges from environment. These are the unique start and end nodes from the chosen cable pieces
-        env_nodes = []
-        env_edges = []
+        env_nodes_lvl = []
+        env_edges_lvl = []
         for i in range(env_matrix.shape[0]):
-            if env_matrix[i, 6] == 1:
-                env_nodes = env_nodes + [env_matrix[i, 0], env_matrix[i, 1]]
-                env_edges = env_edges + [(env_matrix[i, 0], env_matrix[i, 1])]
+            if env_matrix[i, 5] == level and env_matrix[i, 6] == 1:
+                env_nodes_lvl = env_nodes_lvl + [env_matrix[i, 0], env_matrix[i, 1]]
+                env_edges_lvl = env_edges_lvl + [(env_matrix[i, 0], env_matrix[i, 1])]
         # make unique
-        env_nodes = list(set(env_nodes))
-        env_edges = list(set(env_edges))
+        env_nodes_lvl = list(set(env_nodes_lvl))
+        env_edges_lvl = list(set(env_edges_lvl))
 
         # add to Graph
-        g.add_nodes_from(env_nodes)
-        g.add_edges_from(env_edges)
+        g.add_nodes_from(env_nodes_lvl)
+        g.add_edges_from(env_edges_lvl)
 
         # count all nodes that have more than 2 neighbours
         moffen = 0
